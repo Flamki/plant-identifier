@@ -8,7 +8,7 @@ export default function About() {
           <Info className="h-8 w-8 text-white mr-3" />
           <h1 className="text-2xl font-bold text-white">About Us</h1>
         </div>
-        <div className="px-4 py-5 sm:p-6">
+        <div className="px-4 py-5 sm:p-6 text-black">
           <h2 className="text-xl font-semibold mb-4">Our Mission</h2>
           <p className="mb-6">At Plant Identifier, our mission is to connect people with nature by leveraging cutting-edge AI technology. We believe that understanding the plants around us is the first step towards appreciating and preserving our natural world.</p>
 
