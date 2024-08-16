@@ -23,7 +23,7 @@ export default function Contact() {
         </div>
         <div className="px-4 py-5 sm:p-6">
           <p className="text-lg text-gray-700 mb-6">
-            Have a question or feedback? We'd love to hear from you! 
+            Have a question or feedback? We&apos;d love to hear from you! 
             Please feel free to reach out to us at:
           </p>
           <div 
