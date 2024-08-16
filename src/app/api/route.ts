@@ -43,30 +43,24 @@ export async function POST(req: NextRequest) {
 
     console.log('Sending request to Gemini API');
     const result = await model.generateContent([
-      `Identify this plant and provide the following information in JSON format:
-      {
-        "name": "Common name of the plant",
-        "scientificName": "Scientific name of the plant",
-        "family": "Plant family",
-        "origin": "Geographic origin of the plant",
-        "uses": "Common uses of the plant",
-        "description": "A brief description of the plant and its characteristics"
-      }`,
+      `Identify this plant and provide the following information in a structured format:
+      name: [Common name of the plant]
+      scientificName: [Scientific name of the plant]
+      family: [Plant family]
+      origin: [Geographic origin of the plant]
+      uses: [Common uses of the plant]
+      description: [A brief description of the plant and its characteristics]
+      `,
       imagePart,
     ]);
     console.log('Received response from Gemini API');
 
     const responseText = result.response.text();
-    console.log('Response text:', responseText);
+    console.log('Raw response text:', responseText);
 
-    // Parse the JSON response
-    let plantInfo;
-    try {
-      plantInfo = JSON.parse(responseText);
-    } catch (parseError) {
-      console.error('Error parsing JSON response:', parseError);
-      plantInfo = { description: responseText };
-    }
+    // Parse the response text into an object
+    const plantInfo = parseResponseText(responseText);
+    console.log('Parsed plant info:', plantInfo);
 
     return NextResponse.json({ result: plantInfo });
   } catch (error) {
@@ -77,4 +71,27 @@ export async function POST(req: NextRequest) {
       stack: error instanceof Error ? error.stack : 'No stack trace available'
     }, { status: 500 });
   }
+}
+
+function parseResponseText(text: string): Record<string, string> {
+  const lines = text.split('\n');
+  const result: Record<string, string> = {};
+  let currentKey = '';
+
+  for (const line of lines) {
+    const [key, ...valueParts] = line.split(':');
+    if (valueParts.length > 0) {
+      currentKey = key.trim().toLowerCase();
+      result[currentKey] = valueParts.join(':').trim();
+    } else if (currentKey && line.trim()) {
+      result[currentKey] += ' ' + line.trim();
+    }
+  }
+
+  // If parsing fails, store the entire text in the description field
+  if (Object.keys(result).length === 0) {
+    result.description = text.trim();
+  }
+
+  return result;
 }

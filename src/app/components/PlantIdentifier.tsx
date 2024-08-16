@@ -4,17 +4,16 @@ import { useState } from 'react'
 import Image from 'next/image'
 
 interface PlantInfo {
-  name: string;
-  scientificName: string;
-  family: string;
-  origin: string;
-  uses: string;
-  description: string;
+  name?: string;
+  scientificName?: string;
+  family?: string;
+  origin?: string;
+  uses?: string;
+  description?: string;
 }
 
 export default function PlantIdentifier() {
   const [image, setImage] = useState<File | null>(null)
-  const [result, setResult] = useState<string | null>(null)
   const [plantInfo, setPlantInfo] = useState<PlantInfo | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -30,7 +29,6 @@ export default function PlantIdentifier() {
     if (!image) return
 
     setLoading(true)
-    setResult(null)
     setPlantInfo(null)
     setError(null)
 
@@ -53,12 +51,7 @@ export default function PlantIdentifier() {
         throw new Error(`${data.error}: ${data.details || 'No details provided'}`)
       }
 
-      if (typeof data.result === 'string') {
-        setResult(data.result)
-      } else if (typeof data.result === 'object') {
-        setResult(data.result.description || 'No description available')
-        setPlantInfo(data.result)
-      }
+      setPlantInfo(data.result)
     } catch (error) {
       console.error('Error identifying plant:', error)
       setError(`Error identifying plant: ${error instanceof Error ? error.message : String(error)}`)
@@ -69,15 +62,15 @@ export default function PlantIdentifier() {
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4">
-      <header className="text-center mb-12">
-        <h1 className="text-5xl font-bold mb-4 text-green-800">Plant Identifier</h1>
-        <p className="text-xl text-gray-600">
+      <header className="text-center mb-8">
+        <h1 className="text-3xl md:text-5xl font-bold mb-4 text-green-800">Plant Identifier</h1>
+        <p className="text-lg md:text-xl text-gray-600">
           Discover the fascinating world of plants around you!
         </p>
       </header>
 
-      <section className="bg-white p-8 rounded-lg shadow-lg mb-12">
-        <h2 className="text-2xl font-semibold mb-4 text-green-700">Upload Your Plant Image</h2>
+      <section className="bg-white p-4 md:p-8 rounded-lg shadow-lg mb-8">
+        <h2 className="text-xl md:text-2xl font-semibold mb-4 text-green-700">Upload Your Plant Image</h2>
         <p className="mb-4 text-gray-600">
           Take a clear photo of a plant and let our AI identify it for you. Learn about its characteristics, origins, and uses!
         </p>
@@ -103,7 +96,7 @@ export default function PlantIdentifier() {
         {image && (
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2 text-green-600">Preview</h3>
-            <div className="relative w-full h-64 bg-gray-100 rounded-lg overflow-hidden">
+            <div className="relative w-full h-48 md:h-64 bg-gray-100 rounded-lg overflow-hidden">
               <Image
                 src={URL.createObjectURL(image)}
                 alt="Uploaded plant"
@@ -125,36 +118,40 @@ export default function PlantIdentifier() {
       </section>
 
       {error && (
-        <div className="mt-8 p-6 bg-red-100 text-red-700 rounded-lg">
-          <h3 className="text-xl font-bold mb-2">Error Occurred</h3>
+        <div className="mt-8 p-4 md:p-6 bg-red-100 text-red-700 rounded-lg">
+          <h3 className="text-lg md:text-xl font-bold mb-2">Error Occurred</h3>
           <p>{error}</p>
         </div>
       )}
 
-      {result && (
-        <section className="mt-12 bg-white p-8 rounded-lg shadow-lg">
-          <h2 className="text-3xl font-bold mb-6 text-green-800">Identification Results</h2>
-          <div className="prose max-w-none">
-            <p className="text-gray-700 mb-8">{result}</p>
-          </div>
-
-          {plantInfo && (
-            <div>
-              <h3 className="text-2xl font-semibold mb-4 text-green-700">Plant Details</h3>
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <tbody>
-                    {Object.entries(plantInfo).map(([key, value]) => (
-                      <tr key={key} className="border-b border-gray-200">
-                        <td className="py-3 px-4 font-semibold text-gray-600 bg-gray-50">{key.charAt(0).toUpperCase() + key.slice(1)}</td>
-                        <td className="py-3 px-4 text-gray-800">{value}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+      {plantInfo && (
+        <section className="mt-8 bg-white p-4 md:p-8 rounded-lg shadow-lg">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6 text-green-800">Identification Results</h2>
+          {plantInfo.name && (
+            <h3 className="text-3xl md:text-4xl font-bold mb-4 text-indigo-600">{plantInfo.name}</h3>
+          )}
+          
+          {plantInfo.description && (
+            <div className="prose max-w-none mb-8">
+              <p className="text-gray-700">{plantInfo.description}</p>
             </div>
           )}
+
+          <h3 className="text-xl md:text-2xl font-semibold mb-4 text-green-700">Plant Details</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <tbody>
+                {Object.entries(plantInfo).map(([key, value]) => (
+                  key !== 'name' && key !== 'description' && (
+                    <tr key={key} className="border-b border-gray-200">
+                      <td className="py-3 px-4 font-semibold text-gray-600 bg-gray-50">{key.charAt(0).toUpperCase() + key.slice(1)}</td>
+                      <td className="py-3 px-4 text-gray-800">{value}</td>
+                    </tr>
+                  )
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
 
