@@ -1,19 +1,17 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextRequest, NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export async function POST(req: NextRequest) {
   try {
-    console.log('API route called');
+    const body = await req.json();
+    const imageData = body.image;
 
-    const formData = await req.formData();
-    const image = formData.get('image') as File | null;
-
-    if (!image) {
-      console.log('No image provided');
+    if (!imageData) {
       return NextResponse.json({ error: 'No image provided' }, { status: 400 });
     }
 
-    console.log('Image received:', image.name, 'Type:', image.type, 'Size:', image.size, 'bytes');
+    // Remove the data URL prefix to get just the base64 data
+    const base64Data = imageData.split(',')[1];
 
     const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
     if (!apiKey) {
@@ -21,27 +19,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'API key is not set' }, { status: 500 });
     }
 
-    console.log('API Key is set');
-
     const genAI = new GoogleGenerativeAI(apiKey);
-    console.log('GoogleGenerativeAI instance created');
-
     // Updated model name to gemini-1.5-flash
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    console.log('Model instance created');
-
-    const imageData = await image.arrayBuffer();
-    console.log('Image data converted to ArrayBuffer');
 
     const imagePart = {
       inlineData: {
-        data: Buffer.from(imageData).toString('base64'),
-        mimeType: image.type,
+        data: base64Data,
+        mimeType: 'image/jpeg',
       },
     };
-    console.log('Image part created');
 
-    console.log('Sending request to Gemini API');
     const result = await model.generateContent([
       `Identify this plant and provide the following information in a structured format:
       name: [Common name of the plant]
@@ -53,7 +41,6 @@ export async function POST(req: NextRequest) {
       `,
       imagePart,
     ]);
-    console.log('Received response from Gemini API');
 
     const responseText = result.response.text();
     console.log('Raw response text:', responseText);
