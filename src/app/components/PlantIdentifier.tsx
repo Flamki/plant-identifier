@@ -253,10 +253,6 @@ export default function PlantIdentifier() {
         <div className={`absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-green-200 to-transparent opacity-30 blur-xl transition-opacity duration-500 ease-in-out ${activeStep === 0 ? 'opacity-50' : activeStep === 1 ? 'opacity-30' : 'opacity-10'}`}></div>
       </section>
 
-      <footer className="mt-16 text-center text-gray-500">
-        <p>© 2024 Plant Identifier. All rights reserved.</p>
-        <p>Powered by AI and the love for nature.</p>
-      </footer>
     </div>
   )
 }

@@ -22,8 +22,7 @@ const Footer = () => {
           </div>
           <div>
             <h3 className="text-xl font-semibold mb-4">Connect With Us</h3>
-            <p className="text-green-200 mb-2">Email: info@plantidentifier.com</p>
-            <p className="text-green-200 mb-2">Phone: (123) 456-7890</p>
+            <p className="text-green-200 mb-2">Email: fintechgrow@fintechgrow.com</p>
             <div className="flex space-x-4 mt-4">
               <a href="#" className="text-white hover:text-green-200">Facebook</a>
               <a href="#" className="text-white hover:text-green-200">Twitter</a>
